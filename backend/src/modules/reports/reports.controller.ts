@@ -48,4 +48,28 @@ export class ReportsController {
 
     res.end(buffer);
   }
+
+  @Get('student/:studentId/pdf')
+  async downloadPdf(
+    @Param('studentId') studentId: string,
+    @Query('year', ParseIntPipe) year: number,
+    @Query('month', ParseIntPipe) month: number,
+    @CurrentUser('id') userId: string,
+    @Res() res: Response,
+  ) {
+    const { buffer, fileName } = await this.reportsService.generatePdf(
+      studentId,
+      year,
+      month,
+      userId,
+    );
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${encodeURIComponent(fileName)}"`,
+      'Content-Length': buffer.length,
+    });
+
+    res.end(buffer);
+  }
 }

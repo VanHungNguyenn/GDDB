@@ -195,17 +195,29 @@ export function useReport(studentId: string | undefined, year: number, month: nu
   });
 }
 
+async function triggerDownload(blob: Blob, fallbackName: string, headers: Record<string, string>) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  const disposition = headers["content-disposition"];
+  const match = disposition?.match(/filename[^;=\n]*="?([^";\n]+)"?/);
+  a.download = match?.[1] ? decodeURIComponent(match[1]) : fallbackName;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export async function downloadDocx(studentId: string, year: number, month: number) {
   const response = await api.get(`/reports/student/${studentId}/docx`, {
     params: { year, month },
     responseType: "blob",
   });
-  const url = URL.createObjectURL(response.data);
-  const a = document.createElement("a");
-  a.href = url;
-  const disposition = response.headers["content-disposition"];
-  const match = disposition?.match(/filename="?(.+)"?/);
-  a.download = match?.[1] || `report_${month}_${year}.docx`;
-  a.click();
-  URL.revokeObjectURL(url);
+  await triggerDownload(response.data, `report_${month}_${year}.docx`, response.headers as Record<string, string>);
+}
+
+export async function downloadPdf(studentId: string, year: number, month: number) {
+  const response = await api.get(`/reports/student/${studentId}/pdf`, {
+    params: { year, month },
+    responseType: "blob",
+  });
+  await triggerDownload(response.data, `report_${month}_${year}.pdf`, response.headers as Record<string, string>);
 }

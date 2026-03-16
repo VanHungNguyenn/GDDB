@@ -1,12 +1,14 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { DocxGeneratorService, ReportData } from './docx-generator.service';
+import { PdfGeneratorService } from './pdf-generator.service';
 
 @Injectable()
 export class ReportsService {
   constructor(
     private prisma: PrismaService,
     private docxGenerator: DocxGeneratorService,
+    private pdfGenerator: PdfGeneratorService,
   ) {}
 
   async getStudentMonthlyReport(
@@ -98,6 +100,27 @@ export class ReportsService {
 
     const safeName = reportData.student.name.replace(/\s+/g, '_');
     const fileName = `KHGDCN_${safeName}_T${month}_${year}.docx`;
+
+    return { buffer, fileName };
+  }
+
+  async generatePdf(
+    studentId: string,
+    year: number,
+    month: number,
+    teacherId: string,
+  ): Promise<{ buffer: Buffer; fileName: string }> {
+    const reportData = await this.getStudentMonthlyReport(
+      studentId,
+      year,
+      month,
+      teacherId,
+    );
+
+    const buffer = await this.pdfGenerator.generateEvaluationPdf(reportData);
+
+    const safeName = reportData.student.name.replace(/\s+/g, '_');
+    const fileName = `KHGDCN_${safeName}_T${month}_${year}.pdf`;
 
     return { buffer, fileName };
   }

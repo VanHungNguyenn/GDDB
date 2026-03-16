@@ -24,11 +24,11 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { href: "/dashboard", label: "Tổng quan", icon: LayoutDashboard },
-  { href: "/classes", label: "Lớp học & Học sinh", icon: School },
-  { href: "/evaluations", label: "Đánh giá", icon: ClipboardList },
-  { href: "/reports", label: "Báo cáo", icon: FileText },
-  { href: "/users", label: "Giáo viên", icon: UserCog, adminOnly: true },
+  { href: "/dashboard",   label: "Tổng quan",         icon: LayoutDashboard },
+  { href: "/classes",     label: "Lớp học & Học sinh", icon: School },
+  { href: "/evaluations", label: "Đánh giá",           icon: ClipboardList },
+  { href: "/reports",     label: "Báo cáo",            icon: FileText },
+  { href: "/users",       label: "Giáo viên",          icon: UserCog, adminOnly: true },
 ];
 
 interface SidebarProps {
@@ -43,14 +43,16 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 z-40 flex h-screen flex-col border-r border-slate-100 bg-white transition-all duration-300 ease-in-out",
-        collapsed ? "w-[72px]" : "w-[260px]",
+        "fixed left-0 top-0 z-40 flex h-screen flex-col",
+        "border-r border-sidebar-border bg-sidebar",
+        "transition-all duration-300 ease-in-out",
+        collapsed ? "w-18" : "w-65",
       )}
     >
-      {/* ── Logo ────────────────────────────── */}
+      {/* ── Logo ──────────────────────────────────── */}
       <div
         className={cn(
-          "flex h-16 items-center border-b border-slate-100",
+          "flex h-16 items-center border-b border-sidebar-border",
           collapsed ? "justify-center px-0" : "px-5",
         )}
       >
@@ -60,10 +62,10 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           </div>
           {!collapsed && (
             <div className="flex flex-col">
-              <span className="text-[15px] font-bold tracking-tight text-slate-900">
+              <span className="text-[15px] font-bold tracking-tight text-sidebar-foreground">
                 Tam Anh
               </span>
-              <span className="text-[10px] font-medium uppercase tracking-widest text-slate-400">
+              <span className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
                 GDDB System
               </span>
             </div>
@@ -71,65 +73,73 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         </Link>
       </div>
 
-      {/* ── Navigation ──────────────────────── */}
-      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+      {/* ── Navigation ────────────────────────────── */}
+      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
         {!collapsed && (
-          <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+          <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             Menu
           </p>
         )}
-        {navItems.filter((item) => !item.adminOnly || user?.role === "ADMIN").map((item) => {
-          const isActive =
-            pathname === item.href || pathname.startsWith(item.href + "/");
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              title={collapsed ? item.label : undefined}
-              className={cn(
-                "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200",
-                collapsed && "justify-center px-0",
-                isActive
-                  ? "bg-indigo-50 text-indigo-700 shadow-sm shadow-indigo-500/5"
-                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-900",
-              )}
-            >
-              {isActive && (
-                <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-indigo-600" />
-              )}
-              <item.icon
+        {navItems
+          .filter((item) => !item.adminOnly || user?.role === "ADMIN")
+          .map((item) => {
+            const isActive =
+              pathname === item.href || pathname.startsWith(item.href + "/");
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                title={collapsed ? item.label : undefined}
                 className={cn(
-                  "h-[18px] w-[18px] shrink-0 transition-colors duration-200",
+                  "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                  collapsed && "justify-center px-0",
                   isActive
-                    ? "text-indigo-600"
-                    : "text-slate-400 group-hover:text-slate-600",
+                    ? "bg-accent text-accent-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-accent/50 hover:text-sidebar-foreground",
                 )}
-              />
-              {!collapsed && <span>{item.label}</span>}
-            </Link>
-          );
-        })}
+              >
+                {isActive && (
+                  <span className="absolute left-0 top-1/2 h-5 w-0.75 -translate-y-1/2 rounded-r-full bg-primary" />
+                )}
+                <item.icon
+                  className={cn(
+                    "h-4.5 w-4.5 shrink-0 transition-colors duration-200",
+                    isActive
+                      ? "text-primary"
+                      : "text-muted-foreground group-hover:text-sidebar-foreground",
+                  )}
+                />
+                {!collapsed && <span>{item.label}</span>}
+              </Link>
+            );
+          })}
       </nav>
 
-      {/* ── Collapse toggle ─────────────────── */}
-      <div className="border-t border-slate-100 px-3 py-2">
-        <button
-          onClick={onToggle}
-          className="flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2 text-[13px] font-medium text-slate-400 transition-all duration-200 hover:bg-slate-50 hover:text-slate-600 cursor-pointer"
-        >
-          {collapsed ? (
-            <ChevronsRight className="h-4 w-4" />
-          ) : (
-            <>
-              <ChevronsLeft className="h-4 w-4" />
-              <span>Thu gọn</span>
-            </>
-          )}
-        </button>
+      {/* ── Collapse toggle ─────────────────────────── */}
+      <div className="border-t border-sidebar-border px-3 py-2">
+        <div className="flex items-center">
+          <button
+            onClick={onToggle}
+            className={cn(
+              "flex flex-1 items-center justify-center gap-2 rounded-xl px-3 py-2",
+              "text-sm font-medium text-muted-foreground",
+              "transition-all duration-200 hover:bg-accent/50 hover:text-sidebar-foreground cursor-pointer",
+            )}
+          >
+            {collapsed ? (
+              <ChevronsRight className="h-4 w-4" />
+            ) : (
+              <>
+                <ChevronsLeft className="h-4 w-4" />
+                <span>Thu gọn</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
-      {/* ── User footer ─────────────────────── */}
-      <div className="border-t border-slate-100 p-3">
+      {/* ── User footer ───────────────────────────── */}
+      <div className="border-t border-sidebar-border p-3">
         <div
           className={cn(
             "flex items-center rounded-xl p-2 transition-colors",
@@ -137,15 +147,15 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           )}
         >
           {/* Avatar */}
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-xs font-bold text-white shadow-sm">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-indigo-500 to-violet-600 text-xs font-bold text-white shadow-sm">
             {user?.lastName?.charAt(0) ?? "U"}
           </div>
           {!collapsed && (
             <div className="min-w-0 flex-1">
-              <p className="truncate text-[13px] font-semibold text-slate-800">
+              <p className="truncate text-sm font-semibold text-sidebar-foreground">
                 {user?.lastName} {user?.firstName}
               </p>
-              <p className="truncate text-[11px] text-slate-400">
+              <p className="truncate text-xs text-muted-foreground">
                 {user?.role === "ADMIN" ? "Quản trị viên" : "Giáo viên"}
               </p>
             </div>
@@ -153,7 +163,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           {!collapsed && (
             <button
               onClick={logout}
-              className="rounded-lg p-1.5 text-slate-400 transition-all duration-200 hover:bg-red-50 hover:text-red-500 cursor-pointer"
+              className="rounded-lg p-1.5 text-muted-foreground transition-all duration-200 hover:bg-destructive/10 hover:text-destructive cursor-pointer"
               title="Đăng xuất"
             >
               <LogOut className="h-4 w-4" />

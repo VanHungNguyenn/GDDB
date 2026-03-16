@@ -14,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi">
-      <body className="antialiased">
+      <body className="antialiased bg-background text-foreground">
         <Providers>{children}</Providers>
       </body>
     </html>

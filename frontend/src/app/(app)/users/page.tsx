@@ -135,7 +135,7 @@ export default function UsersPage() {
               <CardContent className="flex items-center justify-between p-5">
                 <div className="flex items-center gap-4">
                   {/* Avatar */}
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-sm font-bold text-white">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-indigo-500 to-violet-600 text-sm font-bold text-white">
                     {u.lastName?.charAt(0) ?? "U"}
                   </div>
                   <div>

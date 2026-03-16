@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(cat -A \"e:/2026/GDDB/frontend/src/app/\\(app\\)/reports/page.tsx\")",
+      "Bash(node -e \"const v = require\\(''./node_modules/pdfmake/build/vfs_fonts.js''\\); console.log\\(Object.keys\\(v.pdfMake?.vfs || {}\\)\\)\")"
+    ]
+  }
+}
