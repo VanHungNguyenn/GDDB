@@ -1,0 +1,571 @@
+{
+	"info": {
+		"_postman_id": "gddb-api-collection-2026",
+		"name": "GDDB API",
+		"description": "Special Education Evaluation System API\n\nBase URL: http://localhost:3001/api\n\nAfter login, the token is auto-saved to the collection variable `token`.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{ "key": "baseUrl", "value": "http://localhost:3001/api" },
+		{ "key": "token", "value": "" },
+		{ "key": "classId", "value": "" },
+		{ "key": "studentId", "value": "" },
+		{ "key": "evaluationId", "value": "" },
+		{ "key": "domainId", "value": "" }
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login (Teacher)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.accessToken) {",
+									"    pm.collectionVariables.set('token', res.accessToken);",
+									"    console.log('Token saved to collection variable');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"teacher1@example.com\",\n  \"password\": \"teacher123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						},
+						"description": "Login and receive JWT token. Token is auto-saved to the `token` variable."
+					}
+				},
+				{
+					"name": "Login (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.accessToken) {",
+									"    pm.collectionVariables.set('token', res.accessToken);",
+									"    console.log('Admin token saved');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						},
+						"description": "Login as admin. Required for evaluation domain management."
+					}
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/auth/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "me"]
+						},
+						"description": "Get the authenticated user's profile."
+					}
+				}
+			]
+		},
+		{
+			"name": "Classes",
+			"item": [
+				{
+					"name": "Create Class",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.id) {",
+									"    pm.collectionVariables.set('classId', res.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Lop Mat Troi\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/classes",
+							"host": ["{{baseUrl}}"],
+							"path": ["classes"]
+						}
+					}
+				},
+				{
+					"name": "List My Classes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (Array.isArray(res) && res.length > 0) {",
+									"    pm.collectionVariables.set('classId', res[0].id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/classes",
+							"host": ["{{baseUrl}}"],
+							"path": ["classes"]
+						}
+					}
+				},
+				{
+					"name": "Get Class Detail",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/classes/{{classId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["classes", "{{classId}}"]
+						}
+					}
+				},
+				{
+					"name": "Update Class",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Lop Mat Troi - Updated\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/classes/{{classId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["classes", "{{classId}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Class",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/classes/{{classId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["classes", "{{classId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Students",
+			"item": [
+				{
+					"name": "Create Student",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.id) {",
+									"    pm.collectionVariables.set('studentId', res.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"An\",\n  \"lastName\": \"Nguyen\",\n  \"dateOfBirth\": \"2020-05-12\",\n  \"parentName\": \"Nguyen Thanh\",\n  \"parentPhone\": \"0901234567\",\n  \"classId\": \"{{classId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/students",
+							"host": ["{{baseUrl}}"],
+							"path": ["students"]
+						}
+					}
+				},
+				{
+					"name": "List Students by Class",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.data && res.data.length > 0) {",
+									"    pm.collectionVariables.set('studentId', res.data[0].id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/students?classId={{classId}}&page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["students"],
+							"query": [
+								{ "key": "classId", "value": "{{classId}}" },
+								{ "key": "page", "value": "1" },
+								{ "key": "limit", "value": "20" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Student Detail",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/students/{{studentId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["students", "{{studentId}}"]
+						}
+					}
+				},
+				{
+					"name": "Update Student",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"parentPhone\": \"0987654321\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/students/{{studentId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["students", "{{studentId}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Student",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/students/{{studentId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["students", "{{studentId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Evaluation Domains",
+			"item": [
+				{
+					"name": "List Domains",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (Array.isArray(res) && res.length > 0) {",
+									"    pm.collectionVariables.set('domainId', res[0].id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/evaluation-domains",
+							"host": ["{{baseUrl}}"],
+							"path": ["evaluation-domains"]
+						}
+					}
+				},
+				{
+					"name": "Create Domain (ADMIN)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Ky nang moi\",\n  \"order\": 12\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/evaluation-domains",
+							"host": ["{{baseUrl}}"],
+							"path": ["evaluation-domains"]
+						},
+						"description": "Requires ADMIN role. Login as admin first."
+					}
+				},
+				{
+					"name": "Update Domain (ADMIN)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Domain Name\",\n  \"order\": 5\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/evaluation-domains/{{domainId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["evaluation-domains", "{{domainId}}"]
+						},
+						"description": "Requires ADMIN role."
+					}
+				},
+				{
+					"name": "Delete Domain (ADMIN)",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/evaluation-domains/{{domainId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["evaluation-domains", "{{domainId}}"]
+						},
+						"description": "Requires ADMIN role."
+					}
+				}
+			]
+		},
+		{
+			"name": "Evaluations",
+			"item": [
+				{
+					"name": "Create Evaluation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.id) {",
+									"    pm.collectionVariables.set('evaluationId', res.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"studentId\": \"{{studentId}}\",\n  \"year\": 2026,\n  \"month\": 3,\n  \"notes\": \"Initial evaluation\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/evaluations",
+							"host": ["{{baseUrl}}"],
+							"path": ["evaluations"]
+						},
+						"description": "Creates evaluation and auto-generates one EvaluationSection per existing domain."
+					}
+				},
+				{
+					"name": "List by Class/Month",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/evaluations?classId={{classId}}&year=2026&month=3",
+							"host": ["{{baseUrl}}"],
+							"path": ["evaluations"],
+							"query": [
+								{ "key": "classId", "value": "{{classId}}" },
+								{ "key": "year", "value": "2026" },
+								{ "key": "month", "value": "3" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get by Student/Month",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/evaluations/by-student?studentId={{studentId}}&year=2026&month=3",
+							"host": ["{{baseUrl}}"],
+							"path": ["evaluations", "by-student"],
+							"query": [
+								{ "key": "studentId", "value": "{{studentId}}" },
+								{ "key": "year", "value": "2026" },
+								{ "key": "month", "value": "3" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Evaluation by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/evaluations/{{evaluationId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["evaluations", "{{evaluationId}}"]
+						}
+					}
+				},
+				{
+					"name": "Update Sections",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"sections\": [\n    {\n      \"domainId\": \"{{domainId}}\",\n      \"indicator\": \"ACHIEVED\",\n      \"note\": \"Student completed all motor tasks independently\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/evaluations/{{evaluationId}}/sections",
+							"host": ["{{baseUrl}}"],
+							"path": ["evaluations", "{{evaluationId}}", "sections"]
+						},
+						"description": "Update one or more sections. Indicator values: ACHIEVED, NEEDS_ASSISTANCE, NOT_ACHIEVED, or null."
+					}
+				},
+				{
+					"name": "Update Notes",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"notes\": \"Overall good progress this month\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/evaluations/{{evaluationId}}/notes",
+							"host": ["{{baseUrl}}"],
+							"path": ["evaluations", "{{evaluationId}}", "notes"]
+						}
+					}
+				},
+				{
+					"name": "Finalize Evaluation",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{baseUrl}}/evaluations/{{evaluationId}}/finalize",
+							"host": ["{{baseUrl}}"],
+							"path": ["evaluations", "{{evaluationId}}", "finalize"]
+						},
+						"description": "Locks the evaluation. No further edits allowed after finalization."
+					}
+				}
+			]
+		},
+		{
+			"name": "Reports",
+			"item": [
+				{
+					"name": "Get Report (JSON)",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/reports/student/{{studentId}}?year=2026&month=3",
+							"host": ["{{baseUrl}}"],
+							"path": ["reports", "student", "{{studentId}}"],
+							"query": [
+								{ "key": "year", "value": "2026" },
+								{ "key": "month", "value": "3" }
+							]
+						},
+						"description": "Structured report JSON with student info, evaluation, and all sections."
+					}
+				},
+				{
+					"name": "Download Report (DOCX)",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/reports/student/{{studentId}}/docx?year=2026&month=3",
+							"host": ["{{baseUrl}}"],
+							"path": ["reports", "student", "{{studentId}}", "docx"],
+							"query": [
+								{ "key": "year", "value": "2026" },
+								{ "key": "month", "value": "3" }
+							]
+						},
+						"description": "Downloads a Word document. In Postman, use 'Send and Download' to save the file."
+					}
+				}
+			]
+		}
+	]
+}

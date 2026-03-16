@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+    postgres:
+        image: postgres:16-alpine
+        container_name: gddb-postgres
+        restart: unless-stopped
+        ports:
+            - '5433:5432'
+        environment:
+            POSTGRES_USER: gddb
+            POSTGRES_PASSWORD: gddb_secret
+            POSTGRES_DB: gddb
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+
+volumes:
+    pgdata:

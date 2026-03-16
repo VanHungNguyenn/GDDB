@@ -1,0 +1,40 @@
+# ─── Node.js & Package Managers ────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+pnpm-lock.yaml
+.pnpm-store/
+*.tsbuildinfo
+
+# ─── Environment Variables ─────────────────────────────────
+.env
+.env.*
+
+# ─── Build & Dist ──────────────────────────────────────────
+dist/
+build/
+out/
+
+# ─── Prisma ────────────────────────────────────────────────
+*.db
+*.db-journal
+prisma/generated/
+!prisma/migrations/
+
+# ─── Operating Systems ─────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ─── IDEs ──────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ─── Docker ────────────────────────────────────────────────
+docker-compose.override.yml
+.docker-data/

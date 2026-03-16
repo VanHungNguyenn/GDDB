@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  TEACHER
+}
+
+enum EvaluationIndicator {
+  ACHIEVED          // +
+  NEEDS_ASSISTANCE  // +/-
+  NOT_ACHIEVED      // -
+}
+
+enum EvaluationStatus {
+  DRAFT
+  FINALIZED
+}
+
+// ─── User ────────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      Role     @default(TEACHER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  classes              Class[]      @relation("TeacherClasses")
+  evaluations          Evaluation[] @relation("TeacherEvaluations")
+  finalizedEvaluations Evaluation[] @relation("FinalizedEvaluations")
+
+  @@map("users")
+}
+
+// ─── Class ───────────────────────────────────────────────
+
+model Class {
+  id        String   @id @default(uuid())
+  name      String
+  teacherId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  teacher  User      @relation("TeacherClasses", fields: [teacherId], references: [id], onDelete: Cascade)
+  students Student[]
+
+  @@map("classes")
+}
+
+// ─── Student ─────────────────────────────────────────────
+
+model Student {
+  id          String    @id @default(uuid())
+  firstName   String
+  lastName    String
+  dateOfBirth DateTime?
+  parentName  String?
+  parentPhone String?
+  classId     String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  class       Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
+  evaluations Evaluation[]
+
+  @@map("students")
+}
+
+// ─── Evaluation Domain ───────────────────────────────────
+
+model EvaluationDomain {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sections EvaluationSection[]
+
+  @@map("evaluation_domains")
+}
+
+// ─── Evaluation ──────────────────────────────────────────
+
+model Evaluation {
+  id            String           @id @default(uuid())
+  studentId     String
+  teacherId     String
+  year          Int
+  month         Int
+  notes         String?
+  status        EvaluationStatus @default(DRAFT)
+  finalizedAt   DateTime?
+  finalizedById String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  student     Student             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  teacher     User                @relation("TeacherEvaluations", fields: [teacherId], references: [id])
+  finalizedBy User?               @relation("FinalizedEvaluations", fields: [finalizedById], references: [id])
+  sections    EvaluationSection[]
+
+  @@unique([studentId, year, month])
+  @@index([studentId])
+  @@index([year, month])
+  @@map("evaluations")
+}
+
+model EvaluationSection {
+  id           String               @id @default(uuid())
+  evaluationId String
+  domainId     String
+  note         String?
+  indicator    EvaluationIndicator?
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+
+  evaluation Evaluation       @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  domain     EvaluationDomain @relation(fields: [domainId], references: [id])
+
+  @@unique([evaluationId, domainId])
+  @@map("evaluation_sections")
+}
